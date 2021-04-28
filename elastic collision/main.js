@@ -24,28 +24,25 @@ function draw() {
     drawLineFromSelectedBall();
 }
 
-let isBallSelected = false;
-let selectedBallId;
+let selectedBallId = -1;
 
 function mouseReleased() {
-    if (isBallSelected) {
+    if (selectedBallId >= 0) {
         let ball = balls[selectedBallId];
 
         ball.xVel = (ball.x - mouseX) / dragFactor;
         ball.yVel = (ball.y - mouseY) / dragFactor;
     }
 
-    selectedBallId = undefined;
-    isBallSelected = false;
+    selectedBallId = -1;
     return false;
 }
 
 function mouseDragged() {
-    for (let i = 0; i < maxBalls; i++) {
+    for (let i = 0; i < balls.length; i++) {
         let ball = balls[i];
         let distance = dist(ball.x, ball.y, mouseX, mouseY);
         if (distance < ball.radius && dragFactor > 0) {
-            isBallSelected = true;
             selectedBallId = i;
             break;
         }
@@ -55,7 +52,7 @@ function mouseDragged() {
 }
 
 function drawLineFromSelectedBall() {
-    if (isBallSelected) {
+    if (selectedBallId >= 0) {
         stroke(255, 0, 0);
         strokeWeight(5);
         line(balls[selectedBallId].x, balls[selectedBallId].y, mouseX, mouseY);
