@@ -1,5 +1,5 @@
-const width = window.innerWidth;
-const height = window.innerHeight;
+const width = window.innerWidth - 10;
+const height = window.innerHeight - 10;
 
 const maxBalls = 50;
 
