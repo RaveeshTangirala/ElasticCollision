@@ -10,6 +10,7 @@ const maxBalls = 50;
 const dragFactor = 10;
 
 let balls = [];
+let collidedBalls = [];
 
 function setup() {
     createCanvas(width, height);
@@ -20,8 +21,10 @@ function draw() {
     background(0);
     updateBallPosition();
     handleDynamicBallsCollision();
+    resolveBallCollision();
     handleBallOverlap();
     drawLineFromSelectedBall();
+    collidedBalls = [];
 }
 
 let selectedBallId = -1;
@@ -62,7 +65,7 @@ function drawLineFromSelectedBall() {
 function setupBalls() {
     for (let i = 0; i < maxBalls; i++) {
         let diameter = random(10, 50);
-        let radius = diameter / 2;
+        let radius = 0.5 * diameter;
 
         let xPos = random(radius, width - radius);
         let yPos = random(radius, height - radius);
@@ -90,15 +93,14 @@ function updateBallPosition() {
 }
 
 function handleBallOverlap() {
-    for (let i = 0; i < balls.length; i++) {
-        for (let j = i + 1; j < balls.length; j++) {
-            let ball1 = balls[i];
-            let ball2 = balls[j];
-
-            let distance = dist(ball1.x, ball1.y, ball2.x, ball2.y);
+    for (let ballPairs of collidedBalls) {
+        if (ballPairs.length > 2) {
+            let ball1 = balls[ballPairs[0]];
+            let ball2 = balls[ballPairs[1]];
+            let distance = ballPairs[2];
             let sumOfRadiusOfBalls = ball1.radius + ball2.radius;
             if (distance <= sumOfRadiusOfBalls) {
-                let overlapDistCorrection = (sumOfRadiusOfBalls - distance) / 2;
+                let overlapDistCorrection = 0.5 * (sumOfRadiusOfBalls - distance);
                 let normalizedX = (ball1.x - ball2.x) / distance;
                 let normalizedY = (ball1.y - ball2.y) / distance;
 
@@ -120,33 +122,44 @@ function handleDynamicBallsCollision() {
             let ball1 = balls[i];
             let ball2 = balls[j];
 
-            let distance = dist(ball1.x, ball1.y, ball2.x, ball2.y);
-            if (distance <= (ball1.radius + ball2.radius)) {
-                let normalizedX = (ball1.x - ball2.x) / distance;
-                let normalizedY = (ball1.y - ball2.y) / distance;
+            if (abs(ball1.x - ball2.x) <= (ball1.radius + ball2.radius))
+                collidedBalls.push([i, j]);
+        }
+    }
+}
 
-                let tangentialX = normalizedY;
-                let tangentialY = -normalizedX;
+function resolveBallCollision() {
+    for (let ballPairs of collidedBalls) {
+        let ball1 = balls[ballPairs[0]];
+        let ball2 = balls[ballPairs[1]];
+        let distance = dist(ball1.x, ball1.y, ball2.x, ball2.y);
 
-                let dotProductTangent1 = (ball1.xVel * tangentialX) + (ball1.yVel * tangentialY);
-                let dotProductTangent2 = (ball2.xVel * tangentialX) + (ball2.yVel * tangentialY);
+        if (distance <= (ball1.radius + ball2.radius)) {
+            ballPairs.push(distance);
+            let normalizedX = (ball1.x - ball2.x) / distance;
+            let normalizedY = (ball1.y - ball2.y) / distance;
 
-                let dotProductNormal1 = (ball1.xVel * normalizedX) + (ball1.yVel * normalizedY);
-                let dotProductNormal2 = (ball2.xVel * normalizedX) + (ball2.yVel * normalizedY);
+            let tangentialX = normalizedY;
+            let tangentialY = -normalizedX;
 
-                let conservationOfMomentumNormal1 =
-                    ((2 * ball2.mass * dotProductNormal2) + (dotProductNormal1 * (ball1.mass - ball2.mass)))
-                        / (ball1.mass + ball2.mass);
+            let dotProductTangent1 = (ball1.xVel * tangentialX) + (ball1.yVel * tangentialY);
+            let dotProductTangent2 = (ball2.xVel * tangentialX) + (ball2.yVel * tangentialY);
 
-                let conservationOfMomentumNormal2 =
-                    ((2 * ball1.mass * dotProductNormal1) + (dotProductNormal2 * (ball2.mass - ball1.mass)))
-                        / (ball1.mass + ball2.mass);
+            let dotProductNormal1 = (ball1.xVel * normalizedX) + (ball1.yVel * normalizedY);
+            let dotProductNormal2 = (ball2.xVel * normalizedX) + (ball2.yVel * normalizedY);
 
-                ball1.xVel = (normalizedX * conservationOfMomentumNormal1) + (tangentialX * dotProductTangent1);
-                ball1.yVel = (normalizedY * conservationOfMomentumNormal1) + (tangentialY * dotProductTangent1);
-                ball2.xVel = (normalizedX * conservationOfMomentumNormal2) + (tangentialX * dotProductTangent2);
-                ball2.yVel = (normalizedY * conservationOfMomentumNormal2) + (tangentialY * dotProductTangent2);
-            }
+            let conservationOfMomentumNormal1 =
+                ((2 * ball2.mass * dotProductNormal2) + (dotProductNormal1 * (ball1.mass - ball2.mass)))
+                    / (ball1.mass + ball2.mass);
+
+            let conservationOfMomentumNormal2 =
+                ((2 * ball1.mass * dotProductNormal1) + (dotProductNormal2 * (ball2.mass - ball1.mass)))
+                    / (ball1.mass + ball2.mass);
+
+            ball1.xVel = (normalizedX * conservationOfMomentumNormal1) + (tangentialX * dotProductTangent1);
+            ball1.yVel = (normalizedY * conservationOfMomentumNormal1) + (tangentialY * dotProductTangent1);
+            ball2.xVel = (normalizedX * conservationOfMomentumNormal2) + (tangentialX * dotProductTangent2);
+            ball2.yVel = (normalizedY * conservationOfMomentumNormal2) + (tangentialY * dotProductTangent2);
         }
     }
 }
