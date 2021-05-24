@@ -94,24 +94,21 @@ function updateBallPosition() {
 
 function handleBallOverlap() {
     for (let ballPairs of collidedBalls) {
-        if (ballPairs.length > 2) {
+        if (ballPairs.length >= 4) {
             let ball1 = balls[ballPairs[0]];
             let ball2 = balls[ballPairs[1]];
-            let distance = ballPairs[2];
-            let sumOfRadiusOfBalls = ball1.radius + ball2.radius;
-            if (distance <= sumOfRadiusOfBalls) {
-                let overlapDistCorrection = 0.5 * (sumOfRadiusOfBalls - distance);
-                let normalizedX = (ball1.x - ball2.x) / distance;
-                let normalizedY = (ball1.y - ball2.y) / distance;
+            let sumOfRadius = ballPairs[2];
+            let distance = ballPairs[3];
 
-                let offsetX = normalizedX * overlapDistCorrection;
-                let offsetY = normalizedY * overlapDistCorrection;
+            let overlapDistCorrection = 0.5 * (sumOfRadius - distance);
 
-                ball1.x += offsetX;
-                ball1.y += offsetY;
-                ball2.x -= offsetX;
-                ball2.y -= offsetY;
-            }
+            let offsetX = ((ball1.x - ball2.x) / distance) * overlapDistCorrection;
+            let offsetY = ((ball1.y - ball2.y) / distance) * overlapDistCorrection;
+
+            ball1.x += offsetX;
+            ball1.y += offsetY;
+            ball2.x -= offsetX;
+            ball2.y -= offsetY;
         }
     }
 }
@@ -121,9 +118,10 @@ function handleDynamicBallsCollision() {
         for (let j = i + 1; j < balls.length; j++) {
             let ball1 = balls[i];
             let ball2 = balls[j];
+            let sumOfRadius = ball1.radius + ball2.radius;
 
-            if (abs(ball1.x - ball2.x) <= (ball1.radius + ball2.radius))
-                collidedBalls.push([i, j]);
+            if (abs(ball1.x - ball2.x) <= sumOfRadius && abs(ball1.y - ball2.y) <= sumOfRadius)
+                collidedBalls.push([i, j, sumOfRadius]);
         }
     }
 }
@@ -132,9 +130,10 @@ function resolveBallCollision() {
     for (let ballPairs of collidedBalls) {
         let ball1 = balls[ballPairs[0]];
         let ball2 = balls[ballPairs[1]];
+        let sumOfRadius = ballPairs[2];
         let distance = dist(ball1.x, ball1.y, ball2.x, ball2.y);
 
-        if (distance <= (ball1.radius + ball2.radius)) {
+        if (distance <= sumOfRadius) {
             ballPairs.push(distance);
             let normalizedX = (ball1.x - ball2.x) / distance;
             let normalizedY = (ball1.y - ball2.y) / distance;
