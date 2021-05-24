@@ -9,6 +9,9 @@ const maxBalls = 50;
 */
 const dragFactor = 10;
 
+const coefficientOfRestitution = 1;
+const wallResistance = 1;
+
 let balls = [];
 let collidedBalls = [];
 
@@ -88,7 +91,7 @@ function updateBallPosition() {
         ball.x += ball.xVel;
         ball.y += ball.yVel;
         ball.create(width, height);
-        ball.handleWallCollision(width, height);
+        ball.handleWallCollision(width, height, wallResistance);
     }
 }
 
@@ -148,11 +151,11 @@ function resolveBallCollision() {
             let dotProductNormal2 = (ball2.xVel * normalizedX) + (ball2.yVel * normalizedY);
 
             let conservationOfMomentumNormal1 =
-                ((2 * ball2.mass * dotProductNormal2) + (dotProductNormal1 * (ball1.mass - ball2.mass)))
+                ((ball2.mass * (dotProductNormal2 + (coefficientOfRestitution * (dotProductNormal2 - dotProductNormal1)))) + (ball1.mass * dotProductNormal1))
                     / (ball1.mass + ball2.mass);
 
             let conservationOfMomentumNormal2 =
-                ((2 * ball1.mass * dotProductNormal1) + (dotProductNormal2 * (ball2.mass - ball1.mass)))
+                ((ball1.mass * (dotProductNormal1 + (coefficientOfRestitution * (dotProductNormal1 - dotProductNormal2)))) + (ball2.mass * dotProductNormal2))
                     / (ball1.mass + ball2.mass);
 
             ball1.xVel = (normalizedX * conservationOfMomentumNormal1) + (tangentialX * dotProductTangent1);

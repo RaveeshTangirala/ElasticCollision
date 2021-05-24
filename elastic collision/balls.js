@@ -32,19 +32,13 @@ class Ball {
         return newCoordinate;
     }
 
-    handleWallCollision(width, height) {
-        if (this.y >= height - this.radius) {
-            this.yVel = -this.yVel;
-        }
-        else if (this.y - this.radius <= 0) {
-            this.yVel = -this.yVel;
+    handleWallCollision(width, height, wallResistance) {
+        if ((this.y >= height - this.radius) || (this.y - this.radius <= 0)) {
+            this.yVel = -this.yVel * wallResistance;
         }
 
-        if (this.x >= width - this.radius) {
-            this.xVel = -this.xVel;
-        }
-        else if (this.x - this.radius <= 0) {
-            this.xVel = -this.xVel;
+        if ((this.x >= width - this.radius) || (this.x - this.radius <= 0)) {
+            this.xVel = -this.xVel * wallResistance;
         }
     }
 }
