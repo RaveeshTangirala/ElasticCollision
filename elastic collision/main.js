@@ -10,7 +10,7 @@ const maxBalls = 50;
 const dragFactor = 10;
 
 const coefficientOfRestitution = 1;
-const wallResistance = 1;
+const wallSmoothness = 1;
 
 let balls = [];
 let collidedBalls = [];
@@ -91,7 +91,7 @@ function updateBallPosition() {
         ball.x += ball.xVel;
         ball.y += ball.yVel;
         ball.create(width, height);
-        ball.handleWallCollision(width, height, wallResistance);
+        ball.handleWallCollision(width, height, wallSmoothness);
     }
 }
 
