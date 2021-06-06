@@ -11,6 +11,7 @@ const dragFactor = 10;
 
 const coefficientOfRestitution = 1;
 const wallSmoothnessFactor = 1;
+const acceleration = 1;
 
 let balls = [];
 let collidedBalls = [];
@@ -47,8 +48,9 @@ function mouseReleased() {
 function mouseDragged() {
     for (let i = 0; i < balls.length; i++) {
         let ball = balls[i];
-        let distance = dist(ball.x, ball.y, mouseX, mouseY);
-        if (distance < ball.radius && dragFactor > 0) {
+        let xDist = ball.x - mouseX;
+        let yDist = ball.y - mouseY;
+        if ((xDist * xDist) + (yDist * yDist) < (ball.radius * ball.radius) && dragFactor > 0) {
             selectedBallId = i;
             break;
         }
@@ -88,8 +90,12 @@ function isBallPositionUnique(xPos, yPos, radius) {
 
 function updateBallPosition() {
     for (let ball of balls) {
+        ball.xVel *= acceleration;
+        ball.yVel *= acceleration;
+
         ball.x += ball.xVel;
         ball.y += ball.yVel;
+        
         ball.create(width, height);
         ball.handleWallCollision(width, height, wallSmoothnessFactor);
     }
