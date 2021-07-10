@@ -11,7 +11,7 @@ const dragFactor = 10;
 
 const coefficientOfRestitution = 1;
 const wallSmoothnessFactor = 1;
-const acceleration = 1;
+const acceleration = 0.999;
 
 let balls = [];
 let collidedBalls = [];
