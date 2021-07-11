@@ -9,8 +9,8 @@ const maxBalls = 50;
 */
 const dragFactor = 10;
 
-const coefficientOfRestitution = 1;
-const wallSmoothnessFactor = 1;
+const coefficientOfRestitution = 0.999;
+const wallSmoothnessFactor = 0.999;
 const acceleration = 0.999;
 
 let balls = [];
