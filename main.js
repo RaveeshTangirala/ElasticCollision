@@ -46,6 +46,10 @@ function mouseReleased() {
 }
 
 function mouseDragged() {
+    if (selectedBallId >= 0) {
+        return false;
+    }
+
     for (let i = 0; i < balls.length; i++) {
         let ball = balls[i];
         let xDist = ball.x - mouseX;
