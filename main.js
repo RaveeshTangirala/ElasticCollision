@@ -12,6 +12,7 @@ const dragFactor = 10;
 const coefficientOfRestitution = 0.999;
 const wallSmoothnessFactor = 0.999;
 const acceleration = 0.999;
+const accelerationDueToGravity = 0;//0.498;
 
 let balls = [];
 let collidedBalls = [];
@@ -96,12 +97,13 @@ function updateBallPosition() {
     for (let ball of balls) {
         ball.xVel *= acceleration;
         ball.yVel *= acceleration;
+        ball.yVel += accelerationDueToGravity;
 
         ball.x += ball.xVel;
         ball.y += ball.yVel;
         
         ball.create(width, height);
-        ball.handleWallCollision(width, height, wallSmoothnessFactor);
+        ball.handleBoundaryCollision(width, height, wallSmoothnessFactor);
     }
 }
 

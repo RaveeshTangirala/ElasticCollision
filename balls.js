@@ -32,7 +32,7 @@ class Ball {
         return newCoordinate;
     }
 
-    handleWallCollision(width, height, wallSmoothnessFactor) {
+    handleBoundaryCollision(width, height, wallSmoothnessFactor) {
         if ((this.y >= height - this.radius) || (this.y - this.radius <= 0)) {
             this.yVel = -this.yVel * wallSmoothnessFactor;
         }
